@@ -1,0 +1,48 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  imageName: 'webapidemo'
+  containerRegistry: '<your-acr-name>.azurecr.io'
+
+stages:
+- stage: Build
+  displayName: Build and Push Docker Image
+  jobs:
+  - job: Build
+    displayName: Build and Push
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Install .NET SDK'
+      inputs:
+        packageType: 'sdk'
+        version: '8.0.x'
+
+    - script: |
+        docker build -t $(containerRegistry)/$(imageName):$(Build.BuildId) .
+      displayName: 'Build Docker Image'
+
+    - task: AzureCLI@2
+      displayName: 'Authenticate with Azure'
+      inputs:
+        azureSubscription: '<your-azure-service-connection>'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az acr login --name $(containerRegistry)
+
+    - script: |
+        echo "Logging in to Azure Container Registry"
+        az acr login --name $(containerRegistry)
+      displayName: 'Login to ACR'
+
+    - script: |
+        docker push $(containerRegistry)/$(imageName):$(Build.BuildId)
+      displayName: 'Push Docker Image'
+
+    - script: |
+        echo "Image $(containerRegistry)/$(imageName):$(Build.BuildId) pushed successfully"
+      displayName: 'Confirm Push'
