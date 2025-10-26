@@ -21,8 +21,5 @@ WORKDIR /app
 # Copy the published application files from the build stage
 COPY --from=build /app/out .
 
-# Expose the port the app runs on
-EXPOSE 80
-
 # Set the entry point for the container
 ENTRYPOINT ["dotnet", "webapidemo.dll"]
