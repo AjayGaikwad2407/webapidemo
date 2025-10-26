@@ -6,7 +6,7 @@ pool:
 
 variables:
   imageName: 'webapidemo'
-  containerRegistry: '<your-acr-name>.azurecr.io'
+  containerRegistry: 'prodaksacrkridhaimagerepodocker.azurecr.io'
 
 stages:
 - stage: Build
@@ -28,7 +28,7 @@ stages:
     - task: AzureCLI@2
       displayName: 'Authenticate with Azure'
       inputs:
-        azureSubscription: '<your-azure-service-connection>'
+        azureSubscription: 'devops-spn'
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
