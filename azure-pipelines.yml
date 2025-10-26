@@ -46,3 +46,20 @@ stages:
     - script: |
         echo "Image $(containerRegistry)/$(imageName):$(Build.BuildId) pushed successfully"
       displayName: 'Confirm Push'
+
+    - task: AzureCLI@2
+      displayName: 'Authenticate with AKS'
+      inputs:
+        azureSubscription: 'devops-spn'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az aks get-credentials --resource-group prod-rg --name prod-aks-cluster
+
+    - script: |
+        echo "Deploying application to AKS using Helm"
+        helm upgrade --install $(imageName) ./helm \
+          --set image.repository=$(containerRegistry)/$(imageName) \
+          --set image.tag=$(Build.BuildId) \
+          --namespace default --create-namespace
+      displayName: 'Deploy to AKS'
