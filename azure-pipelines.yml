@@ -22,7 +22,7 @@ stages:
         version: '8.0.x'
 
     - script: |
-        docker build -t $(containerRegistry)/$(imageName):$(Build.BuildId) .
+        docker build -t $(containerRegistry)/$(imageName):$(Build.BuildId) $(Build.SourcesDirectory)/webapidemo
       displayName: 'Build Docker Image'
 
     - task: AzureCLI@2
